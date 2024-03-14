@@ -1,0 +1,12 @@
+Attack: FGSM
+Epsilon: 0.03137254901960784
+Model_type: ensemble
+Model: ['resnet110_cifar100', 'preresnet110_cifar100', 'wrn16_10_cifar100']
+
+TestModel: densenet40_k12_bc_cifar100
+Original images accuracy: 0.586
+Adversarial images accuracy: 0.226
+
+TestModel: resnet164bn_cifar100
+Original images accuracy: 0.894
+Adversarial images accuracy: 0.346
