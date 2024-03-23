@@ -1,7 +1,13 @@
 *.zip
 
 # folders
-/resnet110_cifar100*
+/cifar-100_eval
+/resnet*
 /all_*
 /adv_imgs/*
 __MACOSX
+/hw1_*
+
+# files
+attack_info.txt
+defense_info.txt
