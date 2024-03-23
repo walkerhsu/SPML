@@ -1,0 +1,289 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2023
+
+
+% ready for submission
+% \usepackage{neurips_2023} 
+
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+    % \usepackage[preprint]{neurips_2023}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+  \usepackage[final]{neurips_2023}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2023}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{array,multirow} % for table
+\usepackage{diagbox}        % for table
+
+\title{Homework 1 -- Graybox Attack}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+\newcommand{\model}{
+  \begin{tabular}{c}
+    $resnet164bn\_cifar100$ \\
+    $wrn16\_10\_cifar100$ \\
+    $ror3\_164\_cifar100$ \\
+    $rir\_cifar100$ \\
+    $pyramidnet110\_a270\_cifar100$
+  \end{tabular}
+}
+
+\newcommand {\defenseAccuracy}[2] {
+  \begin{tabular}{c}
+    #1 $\rightarrow$ #2 \\
+  \end{tabular}
+}
+
+\newcommand{\accuracy}[5]{
+  \begin{tabular}{c}
+    #1 \\
+    #2 \\
+    #3 \\
+    #4 \\
+    #5 \\
+  \end{tabular}
+}
+
+\author{%
+  Walker \\
+  Department of Electrical Engineering \\
+  B10901036 \\
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{abstract}
+  This homework is about implementing graybox attack.
+  By using different kinds of attacks, such as FGSM, MI-FGSM and PGD, we can generate adversarial examples to attack the model.
+  Also, I would like to test the transferbility of the adversarial attacks on each attack.
+  Moreover, different hyperparameters will affect the robustness and transferbility of the adversarial examples.
+  In the end, I will try adversarial training to see the effect of adversarial training on the model's robustness.
+\end{abstract}
+
+\section{Attack}
+In this homework, I use the CIFAR-100 dataset, which consists of 500 inference images in 100 classes, with 5 images per class.
+I have tried various attacks on the CIFAR-100 dataset, including FGSM, MI-FGSM and PGD attack.
+For each attack, I want to check the robustness and the transferbility of these adversarial examples.
+To do so, I generate te adversarial examples in two ways:
+
+\begin{enumerate}
+    \item Single model attack
+    \item Ensemble attack
+\end{enumerate}
+
+
+
+\subsection{Three Attack Methods}
+I implement three different attacks on the CIFAR-100 dataset to generate adversarial examples.:
+
+\begin{enumerate}
+  \item Fast Gradient Sign Method (FGSM)
+  \item Momentum Iterative Fast Gradient Sign Method (MI-FGSM)
+  \item Projected Gradient Descent (PGD)
+\end{enumerate}
+
+For all of the attacks, the perturbation is limited by $\ell_\infty$-norm, with $\epsilon$ set to $\frac{8}{255}$.
+For both MI-FGSM and PGD attacks, the iteration number is set to $4$.
+The results of the attacks are shown in Table \ref{table:attack_result}.
+
+\begin{table}
+  \centering
+  \label{table:attack_result}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      Attack type & Attack method & Tested Model & Acc.\\
+      \hline
+      No Attack & Original & \model & \accuracy{0.808}{0.978}{0.862}{0.952}{0.986} \\
+      \hline
+      \hline
+      \multirow{12}{*}{Single Model Attack} 
+        & FGSM     & \model & \accuracy{0.140}{0.346}{0.208}{0.318}{0.474} \\
+      \cline{2-4}
+        & MIFGSM   & \model & \accuracy{\textbf{0.006}}{0.188}{\textbf{0.104}}{\textbf{0.16}}{\textbf{0.352}} \\
+      \cline{2-4}
+        & PGD      & \model & \accuracy{0.008}{0.486}{0.248}{0.402}{0.648} \\
+      \hline
+      \hline
+      \multirow{12}{*}{Ensemble Attack} 
+        & FGSM     & \model & \accuracy{0.214}{0.214}{0.310}{0.438}{0.526} \\
+      \cline{2-4}
+        & MIFGSM   & \model & \accuracy{0.042}{\textbf{0.018}}{0.242}{0.314}{0.438} \\
+      \cline{2-4}
+        & PGD      & \model & \accuracy{0.126}{0.158}{0.456}{0.616}{0.770} \\
+      \hline
+    \end{tabular}
+  \newline
+  \caption{The table shows the accuracy of the adversarial examples on the tested models with different attacks. 
+          The \textbf{bold black number} represents the best attack (lowest accuracy) on the same model for all kinds of attack.}
+\end{table}
+
+There are plenty of models we can choose to attack from the model lists\footnote{The available models are listed in the github \url{https://github.com/osmr/imgclsmob/blob/master/pytorch/pytorchcv/model_provider.py} }
+After trials and error, I use $resnet164bn\_cifar100$ to generate the adversarial examples for single model attack,
+and use three different models below to generate the adversarial examples for ensemble attack.
+
+\begin{enumerate}
+  \item $resnet164bn\_cifar100$
+  \item $preresnet110\_cifar100$
+  \item $wrn16\_10\_cifar100$
+\end{enumerate}
+
+For ensemble attack, three of the models above will generate the adversarial examples respectively and then return the average image of the three adveresarial examples.
+
+To check the relationship between the effect of adversarial attack and the transferbility of the adersarial examples, 
+I use the generated adversarial examples above on 5 different models:
+
+\begin{enumerate}
+  \item $resnet164bn\_cifar100$
+  \item $wrn16\_10\_cifar100$
+  \item $ror3\_164\_cifar100$
+  \item $rir\_cifar100$
+  \item $pyramidnet110\_a270\_cifar100$
+\end{enumerate}
+
+The first model is the same as the model used to generate the adversarial examples (both single model attack and ensemble attack),
+and the second model is a model used to generate the adversarial examples on ensemble attack.
+The other three models are used to test the transferbility of the adversarial examples.
+
+We can see that using MI-FGSM attack can not only generate the best adversarial examples for the same model attack,
+but the examples can also transfer to other models with low accuracy.
+Also, in my model selection, \textbf{single model attack can have better transferability than ensemble model attack.}
+
+\subsection{Hyperparameters}
+
+For MI-FGSM and PGD attack, I have tried different iteration number to see whether the model robustness and transferability will change.
+The result is shown in Table \ref{table:hyperparameter_result}.
+
+We can see that for both MI-FGSM and PGD attack,
+the iteration number acts as the trade-off factor between the robustness and transferability.
+The more iteration number, the better the model robustness on the trained model, but the worse the transferability on the other models that are not used for training.
+\begin{table}
+  \centering
+  \label{table:hyperparameter_result}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      Attack method & Tested Model & Small Iter Acc & Big Iter Acc\\
+      \hline
+      \multirow{1}{*}{MI-FGSM Attack} 
+        & \model & \accuracy{\textbf{0.000}}{\textbf{0.172}}{\textbf{0.082}}{\textbf{0.134}}{\textbf{0.334}} & \accuracy{\textbf{0.000}}{0.184}{0.104}{0.146}{0.398}\\
+      \hline
+      \multirow{1}{*}{PGD Attack} 
+        & \model & \accuracy{0.008}{\textbf{0.450}}{\textbf{0.232}}{\textbf{0.368}}{\textbf{0.608}} & \accuracy{\textbf{0.000}}{0.502}{0.260}{0.436}{0.668} \\
+      \hline
+    \end{tabular}
+  \newline
+  \caption{The table shows the accuracy of the adversarial examples on the tested models with different iteration numbers for both MI-FGSM and PGD attack.
+          For MI-FGSM attack, the iteration number is 16 and 64, and for PGD attack, the iteration number is 4 and 16.
+          The \textbf{bold black number} represents the better attack (lower accuracy) on the same model for the same attack.}
+\end{table}
+
+
+\section{Defense}
+
+To see the effect of adversarial training, I use the adversarial examples generated from the attack mentioned above to train the model.
+
+There are a total of 5000 images, with 3 types of adversarial images, generated from
+
+\begin{enumerate}
+  \item FGSM attack $\cdot$ 1000
+  \item MI-FGSM attack $\cdot$ 2000
+  \item PGD attack $\cdot$ 2000
+\end{enumerate}
+
+These adversarial images are used to train the model with adversarial training respectively.
+
+The model I choose for adversarial training is $resnet110\_cifar100$ . 
+To see whether adversarial training with one type of adveresarial images can improve the model's robustness on other adversarial examples,
+I train the model with three types of adversarial images respectively and test the model on the adversarial images.
+The result is shown in Table \ref{table:defense_result}.
+
+This result shows that for each training set of adversarial images, the accuracy tested on the same type of adversarial examples can have the best accuracy improvement.
+Also, FGSM-based adversarial exmaples are better to defend since for both MIFGSM-trained and PGD-trained models,
+the accuracy improvements on FGSM adversarial examples enhance quite a lot (about 28 percent) compared with the other two types of adversarial examples (about 14 percent).
+This can be an indirect sign that FGSM-based adversarial examples are weaker than the other two types of adversarial examples.
+
+
+\begin{table}
+  \centering
+  \label{table:defense_result}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \diagbox[width=12em, height=3.7em]{Training \\adversarial examples}{testing adversarial\\examples} & FGSM & MI-FGSM & PGD \\
+      \hline
+      FGSM & \textbf{\defenseAccuracy{0.187}{0.767}} & \defenseAccuracy{0.014}{0.058} & \defenseAccuracy{0.019}{0.049} \\
+      MI-FGSM & \defenseAccuracy{0.016}{0.286} & \textbf{\defenseAccuracy{0.53}{0.953}} & \defenseAccuracy{0.006}{0.145} \\
+      PGD & \defenseAccuracy{0.027}{0.294} & \defenseAccuracy{0.011}{0.147} & \textbf{\defenseAccuracy{0.073}{0.977}} \\
+      \hline
+    \end{tabular}
+  \newline
+  \caption{The table shows the accuracy before and after the adversarial training for different training and testing adversarial examples. 
+          The \textbf{bold black accuracy change} represents the best accuracy improvement in each row.}
+\end{table}
+
+\section{Conclusion}
+
+In this homework, I have implemented three different attacks on the CIFAR-100 dataset to generate adversarial examples.
+I have also tried different hyperparameters for each attack to see the effect of the robustness and transferability of the adversarial examples.
+The result shows that MI-FGSM attack can generate the best adversarial examples for the same model attack, and the examples can also transfer to the other model with the best accuracy.
+Also, in my model selection, single model attack can have better transferability than ensemble attack.
+
+I have also tried adversarial training to see the effect of adversarial training on the model's robustness.
+The result shows that for each training set of adversarial images, the accuracy tested on the same type of adversarial examples can have the best accuracy improvement.
+Also, FGSM-based adversarial exmaples are better to defend since for both MIFGSM-trained and PGD-trained models,
+
+\section*{Homework Submission}
+
+For submission, I use the adversarial examples generated from MI-FGSM model with single model attack.
+The iteration number is set to 16, and the model used to generate the adversarial examples is $resnet164bn\_cifar100$.
+
+\section*{Github Code}
+
+The code for this homework is available on my github repository: \\
+\url{https://github.com/walkerhsu/SPML/tree/main/greybox_attack}
+
+\section*{References}
+
+
+
+{
+\small
+
+
+[1] torchattack github link: {\url{https://github.com/Harry24k/adversarial-attacks-pytorch}}
+
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}

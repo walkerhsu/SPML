@@ -1,12 +1,58 @@
-Attack: FGSM
+Attack: MIFGSM 
 Epsilon: 0.03137254901960784
-Model_type: ensemble
-Model: ['resnet110_cifar100', 'preresnet110_cifar100', 'wrn16_10_cifar100']
+Decay: 0.9
+Steps: 16
+Model_type: single
+Model: resnet164bn_cifar100
 
-TestModel: densenet40_k12_bc_cifar100
-Original images accuracy: 0.586
-Adversarial images accuracy: 0.226
+TestModel: resnet20_cifar100
+Original images accuracy: 0.496
+Adversarial images accuracy: 0.104
 
-TestModel: resnet164bn_cifar100
-Original images accuracy: 0.894
-Adversarial images accuracy: 0.346
+TestModel: wrn16_10_cifar100
+Original images accuracy: 0.978
+Adversarial images accuracy: 0.15
+
+TestModel: ror3_164_cifar100
+Original images accuracy: 0.862
+Adversarial images accuracy: 0.15
+
+TestModel: rir_cifar100
+Original images accuracy: 0.952
+Adversarial images accuracy: 0.132
+
+TestModel: pyramidnet110_a270_cifar100
+Original images accuracy: 0.986
+Adversarial images accuracy: 0.306
+
+TestModel: resnet110_cifar100
+Original images accuracy: 0.808
+Adversarial images accuracy: 0.1
+
+TestModel: preresnet164bn_cifar100
+Original images accuracy: 0.926
+Adversarial images accuracy: 0.066
+
+TestModel: resnext29_32x4d_cifar100
+Original images accuracy: 0.952
+Adversarial images accuracy: 0.126
+
+TestModel: seresnet164bn_cifar100
+Original images accuracy: 0.788
+Adversarial images accuracy: 0.088
+
+TestModel: sepreresnet272bn_cifar100
+Original images accuracy: 0.794
+Adversarial images accuracy: 0.112
+
+TestModel: densenet100_k12_cifar100
+Original images accuracy: 0.936
+Adversarial images accuracy: 0.114
+
+TestModel: diaresnet164bn_cifar100
+Original images accuracy: 0.848
+Adversarial images accuracy: 0.114
+
+TestModel: diapreresnet164bn_cifar100
+Original images accuracy: 0.9
+Adversarial images accuracy: 0.114
