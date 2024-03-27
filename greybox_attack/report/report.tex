@@ -213,8 +213,8 @@ Also, Table \ref{table:hyperparameter_result} proves again that MI-FGSM attack c
       \hline
     \end{tabular}
   \newline
-  \caption{The table shows the accuracy of the adversarial examples on the tested models with different iteration numbers for both \DIFGSM and PGD attack.
-          For \DIFGSM and PGD attack, the iteration numbers are both 16 and 64.
+  \caption{The table shows the accuracy of the adversarial examples on the tested models with different iteration numbers for MI-FGSM, \DIFGSM and PGD attack.
+          For all three attacks, the iteration numbers are all 16 and 64.
           The \textbf{bold black number} represents the better attack (lower accuracy) on the same model for the same attack.}
 \end{table}
 
@@ -249,10 +249,10 @@ This can be an indirect sign that FGSM-based adversarial examples are weaker tha
   \label{table:defense_result}
     \begin{tabular}{|c|c|c|c|}
       \hline
-      \diagbox[width=12em, height=3.7em]{Training \\adversarial examples}{testing adversarial\\examples} & FGSM & \DIFGSM & PGD \\
+      \diagbox[width=12em, height=3.7em]{Training \\adversarial examples}{testing adversarial\\examples} & FGSM & MI-FGSM & PGD \\
       \hline
       FGSM & \textbf{\defenseAccuracy{0.187}{0.767}} & \defenseAccuracy{0.014}{0.058} & \defenseAccuracy{0.019}{0.049} \\
-      \DIFGSM & \defenseAccuracy{0.016}{0.286} & \textbf{\defenseAccuracy{0.53}{0.953}} & \defenseAccuracy{0.006}{0.145} \\
+      MI-FGSM & \defenseAccuracy{0.016}{0.286} & \textbf{\defenseAccuracy{0.53}{0.953}} & \defenseAccuracy{0.006}{0.145} \\
       PGD & \defenseAccuracy{0.027}{0.294} & \defenseAccuracy{0.011}{0.147} & \textbf{\defenseAccuracy{0.073}{0.977}} \\
       \hline
     \end{tabular}
