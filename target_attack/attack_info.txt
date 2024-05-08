@@ -1,0 +1,7 @@
+Attack: DIFGSM 
+Epsilon: 0.01568627450980392
+Model_type: ensemble
+Decay: 0.9
+Steps: 90
+Model_type: ensemble
+Model: ['resnet110_cifar100', 'preresnet164bn_cifar100', 'seresnet110_cifar100', 'densenet40_k36_bc_cifar100', 'diaresnet110_cifar100']
